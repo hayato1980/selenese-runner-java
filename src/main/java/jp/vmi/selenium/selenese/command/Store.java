@@ -3,12 +3,12 @@ package jp.vmi.selenium.selenese.command;
 import java.util.Arrays;
 
 import jp.vmi.selenium.selenese.Runner;
-
 import jp.vmi.selenium.selenese.TestCase;
-import jp.vmi.selenium.selenese.cmdproc.CustomCommandProcessor;
+import jp.vmi.selenium.selenese.cmdproc.SeleneseRunnerCommandProcessor;
 import jp.vmi.selenium.selenese.result.Result;
 import jp.vmi.selenium.selenese.result.Success;
-import static jp.vmi.selenium.selenese.cmdproc.CustomCommandProcessor.*;
+
+import static jp.vmi.selenium.selenese.cmdproc.SeleneseRunnerCommandProcessor.*;
 
 /**
  * Command "store".
@@ -52,7 +52,7 @@ public class Store extends Command {
 
     @Override
     protected Result doCommandImpl(TestCase testCase, Runner runner) {
-        CustomCommandProcessor proc = testCase.getProc();
+        SeleneseRunnerCommandProcessor proc = testCase.getProc();
         Object result = proc.execute(getter, getterArgs);
         proc.setVar(result, varName);
         return new Success(String.valueOf(result));
