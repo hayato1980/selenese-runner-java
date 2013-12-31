@@ -38,7 +38,7 @@ import static org.openqa.selenium.remote.CapabilityType.*;
 /**
  * Provide Java API to run Selenese script.
  */
-public class Runner implements HtmlResultHolder {
+public class Runner implements BaseURLHolder, HtmlResultHolder {
 
     private static final Logger log = LoggerFactory.getLogger(Runner.class);
 
@@ -255,6 +255,7 @@ public class Runner implements HtmlResultHolder {
      * </p>
      * @return URL.
      */
+    @Override
     public String getBaseURL() {
         return baseURL;
     }
