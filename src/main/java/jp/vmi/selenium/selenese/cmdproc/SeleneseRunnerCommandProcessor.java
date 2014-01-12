@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import com.thoughtworks.selenium.SeleniumException;
 
 import jp.vmi.selenium.selenese.BaseURLHolder;
+import jp.vmi.selenium.selenese.VarsMap;
 import jp.vmi.selenium.selenese.locator.WebDriverElementFinder;
 
 /**
@@ -33,7 +34,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
     private AlertOverride alertOverride = null;
     private Windows windows = null;
 
-    private final Map<String, Object> varsMap;
+    private final VarsMap varsMap;
     private final Eval eval;
 
     final List<HighlightStyleBackup> styleBackups = new ArrayList<HighlightStyleBackup>();
@@ -45,7 +46,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
      * @param driver WebDriver instance.
      * @param varsMap variable map.
      */
-    public SeleneseRunnerCommandProcessor(BaseURLHolder holder, WebDriver driver, Map<String, Object> varsMap) {
+    public SeleneseRunnerCommandProcessor(BaseURLHolder holder, WebDriver driver, VarsMap varsMap) {
         this.driver = driver;
         this.varsMap = varsMap;
         this.eval = new Eval(holder, varsMap);
@@ -249,6 +250,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
      * @param value value.
      * @param varName variable name.
      */
+    @Deprecated
     public void setVar(Object value, String varName) {
         varsMap.put(varName, value);
     }
@@ -259,6 +261,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
      * @param varName variable name.
      * @return value.
      */
+    @Deprecated
     public Object getVar(String varName) {
         return varsMap.get(varName);
     }
@@ -269,6 +272,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
      * @param expr expression string.
      * @return replaced string.
      */
+    @Deprecated
     public String replaceVars(String expr) {
         StrSubstitutor s = new StrSubstitutor(varsMap);
         return s.replace(expr);
@@ -280,6 +284,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
      * @param exprs expression strings.
      * @return replaced strings.
      */
+    @Deprecated
     public String[] replaceVarsForArray(String[] exprs) {
         String[] result = new String[exprs.length];
         for (int i = 0; i < exprs.length; i++)
