@@ -34,7 +34,7 @@ import static org.openqa.selenium.remote.CapabilityType.*;
 /**
  * Provide Java API to run Selenese script.
  */
-public class Runner implements BaseURLHolder, HtmlResultHolder {
+public class Runner implements Context, HtmlResultHolder {
 
     private static final Logger log = LoggerFactory.getLogger(Runner.class);
 
@@ -157,7 +157,13 @@ public class Runner implements BaseURLHolder, HtmlResultHolder {
      * </p>
      * @return WebDriver.
      */
+    @Deprecated
     public WebDriver getDriver() {
+        return getWrappedDriver();
+    }
+
+    @Override
+    public WebDriver getWrappedDriver() {
         return driver;
     }
 
@@ -365,6 +371,7 @@ public class Runner implements BaseURLHolder, HtmlResultHolder {
      *
      * @return the evaluated variables (state) for the current context.
      */
+    @Override
     public VarsMap getVarsMap() {
         return this.varsMap;
     }

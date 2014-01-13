@@ -4,7 +4,7 @@ import org.openqa.selenium.internal.seleniumemulation.CompoundMutator;
 import org.openqa.selenium.internal.seleniumemulation.ScriptMutator;
 import org.openqa.selenium.internal.seleniumemulation.VariableDeclaration;
 
-import jp.vmi.selenium.selenese.BaseURLHolder;
+import jp.vmi.selenium.selenese.Context;
 import jp.vmi.selenium.selenese.cmdproc.VariableDeclarationWithDynamicValue.DynamicValue;
 
 /**
@@ -14,16 +14,16 @@ public class SeleneseRunnerMutator extends CompoundMutator implements ScriptMuta
 
     private static final String BASE_URL = "selenium.browserbot.baseUrl";
 
-    private final BaseURLHolder holder;
+    private final Context context;
 
     /**
      * Constructor.
      *
-     * @param holder base URL holder.
+     * @param context Selenese Runner context.
      */
-    public SeleneseRunnerMutator(BaseURLHolder holder) {
+    public SeleneseRunnerMutator(Context context) {
         super("");
-        this.holder = holder;
+        this.context = context;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class SeleneseRunnerMutator extends CompoundMutator implements ScriptMuta
                 mutator = new VariableDeclarationWithDynamicValue(BASE_URL, new DynamicValue() {
                     @Override
                     public String getValue() {
-                        return holder.getBaseURL();
+                        return context.getBaseURL();
                     }
                 });
             }

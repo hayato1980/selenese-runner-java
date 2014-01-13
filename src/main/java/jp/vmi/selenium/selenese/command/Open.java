@@ -22,7 +22,7 @@ public class Open extends Command {
         String url = runner.getVarsMap().replaceVars(args[URL]);
         if (!url.contains("://"))
             url = testCase.getBaseURL() + (url.startsWith("/") ? "" : "/") + url;
-        runner.getDriver().get(url);
+        runner.getWrappedDriver().get(url);
         return SUCCESS;
     }
 }
