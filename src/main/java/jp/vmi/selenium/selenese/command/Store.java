@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import jp.vmi.selenium.selenese.Runner;
 import jp.vmi.selenium.selenese.TestCase;
-import jp.vmi.selenium.selenese.cmdproc.SeleneseRunnerCommandProcessor;
 import jp.vmi.selenium.selenese.result.Result;
 import jp.vmi.selenium.selenese.result.Success;
 
@@ -52,9 +51,8 @@ public class Store extends Command {
 
     @Override
     protected Result doCommandImpl(TestCase testCase, Runner runner) {
-        SeleneseRunnerCommandProcessor proc = testCase.getProc();
-        Object result = proc.execute(getter, getterArgs);
-        proc.setVar(result, varName);
+        Object result = testCase.getProc().execute(getter, getterArgs);
+        runner.getVarsMap().put(varName, result);
         return new Success(String.valueOf(result));
     }
 }

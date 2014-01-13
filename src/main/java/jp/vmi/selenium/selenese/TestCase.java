@@ -244,7 +244,7 @@ public class TestCase implements Selenese, ITestCase {
             result = result.update(r);
             if (result.isAborted())
                 break;
-            command = command.next(this);
+            command = command.next(this, runner);
             runner.waitSpeed();
         }
         return result;
