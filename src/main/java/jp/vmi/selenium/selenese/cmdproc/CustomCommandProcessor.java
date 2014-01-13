@@ -4,7 +4,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverCommandProcessor;
 import org.openqa.selenium.internal.seleniumemulation.SeleneseCommand;
 
-import jp.vmi.selenium.selenese.BaseURLHolder;
+import jp.vmi.selenium.selenese.Context;
 import jp.vmi.selenium.selenese.VarsMap;
 
 /**
@@ -22,14 +22,25 @@ public class CustomCommandProcessor extends WebDriverCommandProcessor {
      * @param driver WebDriver instance.
      * @param varsMap variable map.
      */
-    public CustomCommandProcessor(final String baseUrl, final WebDriver driver, VarsMap varsMap) {
+    public CustomCommandProcessor(final String baseUrl, final WebDriver driver, final VarsMap varsMap) {
         super(baseUrl, driver); // dummy
-        this.proc = new SeleneseRunnerCommandProcessor(new BaseURLHolder() {
+        this.proc = new SeleneseRunnerCommandProcessor(new Context() {
+
             @Override
             public String getBaseURL() {
                 return baseUrl;
             }
-        }, driver, varsMap);
+
+            @Override
+            public WebDriver getWrappedDriver() {
+                return driver;
+            }
+
+            @Override
+            public VarsMap getVarsMap() {
+                return varsMap;
+            }
+        });
     }
 
     /**

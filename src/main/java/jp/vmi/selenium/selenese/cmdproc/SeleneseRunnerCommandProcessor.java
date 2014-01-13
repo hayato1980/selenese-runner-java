@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.text.StrSubstitutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
@@ -14,8 +13,7 @@ import org.openqa.selenium.internal.seleniumemulation.*;
 import com.google.common.collect.Maps;
 import com.thoughtworks.selenium.SeleniumException;
 
-import jp.vmi.selenium.selenese.BaseURLHolder;
-import jp.vmi.selenium.selenese.VarsMap;
+import jp.vmi.selenium.selenese.Context;
 import jp.vmi.selenium.selenese.locator.WebDriverElementFinder;
 
 /**
@@ -25,7 +23,6 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
 
     private final Map<String, SeleneseCommand<?>> seleneseMethods = Maps.newHashMap();
     private final boolean enableAlertOverrides = true;
-    private final WebDriver driver;
 
     private final Timer timer = null;
     private JavascriptLibrary javascriptLibrary = null;
@@ -34,7 +31,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
     private AlertOverride alertOverride = null;
     private Windows windows = null;
 
-    private final VarsMap varsMap;
+    private final Context context;
     private final Eval eval;
 
     final List<HighlightStyleBackup> styleBackups = new ArrayList<HighlightStyleBackup>();
@@ -42,20 +39,17 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
     /**
      * Constructor.
      *
-     * @param holder base URL holder.
-     * @param driver WebDriver instance.
-     * @param varsMap variable map.
+     * @param context Selenese Runner context.
      */
-    public SeleneseRunnerCommandProcessor(BaseURLHolder holder, WebDriver driver, VarsMap varsMap) {
-        this.driver = driver;
-        this.varsMap = varsMap;
-        this.eval = new Eval(holder, varsMap);
+    public SeleneseRunnerCommandProcessor(Context context) {
+        this.context = context;
+        this.eval = new Eval(context);
 
         this.javascriptLibrary = new JavascriptLibrary();
         this.elementFinder = new WebDriverElementFinder();
         this.keyState = new KeyState();
         this.alertOverride = new AlertOverride(enableAlertOverrides);
-        this.windows = new Windows(driver);
+        this.windows = new Windows(context.getWrappedDriver()); // FIXME
         setUpMethodMap();
     }
 
@@ -207,7 +201,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
 
     @Override
     public WebDriver getWrappedDriver() {
-        return driver;
+        return context.getWrappedDriver();
     }
 
     /**
@@ -233,7 +227,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
             throw new SeleniumException("No such command: " + commandName);
         try {
             @SuppressWarnings("unchecked")
-            T result = (T) command.apply(driver, replaceVarsForArray(args));
+            T result = (T) command.apply(context.getWrappedDriver(), context.getVarsMap().replaceVarsForArray(args));
             return result;
         } catch (RuntimeException e) {
             // for HtmlUnit
@@ -252,7 +246,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
      */
     @Deprecated
     public void setVar(Object value, String varName) {
-        varsMap.put(varName, value);
+        context.getVarsMap().put(varName, value);
     }
 
     /**
@@ -263,7 +257,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
      */
     @Deprecated
     public Object getVar(String varName) {
-        return varsMap.get(varName);
+        return context.getVarsMap().get(varName);
     }
 
     /**
@@ -274,8 +268,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
      */
     @Deprecated
     public String replaceVars(String expr) {
-        StrSubstitutor s = new StrSubstitutor(varsMap);
-        return s.replace(expr);
+        return context.getVarsMap().replaceVars(expr);
     }
 
     /**
@@ -286,10 +279,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
      */
     @Deprecated
     public String[] replaceVarsForArray(String[] exprs) {
-        String[] result = new String[exprs.length];
-        for (int i = 0; i < exprs.length; i++)
-            result[i] = replaceVars(exprs[i]);
-        return result;
+        return context.getVarsMap().replaceVarsForArray(exprs);
     }
 
     /**
@@ -299,6 +289,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
      * @param highlightStyle highlight style.
      */
     public void highlight(String locator, HighlightStyle highlightStyle) {
+        WebDriver driver = context.getWrappedDriver();
         WebElement element;
         try {
             element = elementFinder.findElement(driver, locator);
@@ -318,7 +309,7 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
         if (styleBackups.isEmpty())
             return;
         for (HighlightStyleBackup backup : styleBackups)
-            backup.restore(driver);
+            backup.restore(context.getWrappedDriver());
         styleBackups.clear();
     }
 

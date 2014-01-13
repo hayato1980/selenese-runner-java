@@ -11,7 +11,8 @@ import org.openqa.selenium.WebDriver;
 
 import com.thoughtworks.selenium.SeleniumException;
 
-import jp.vmi.selenium.selenese.BaseURLHolder;
+import jp.vmi.selenium.selenese.Context;
+import jp.vmi.selenium.selenese.VarsMap;
 
 /**
  * Evaluator of script including "storedVars" variable.
@@ -19,17 +20,16 @@ import jp.vmi.selenium.selenese.BaseURLHolder;
 public class Eval {
 
     private final SeleneseRunnerMutator mutator;
-    private final Map<String, Object> varsMap;
+    private final Context context;
 
     /**
      * Constructor.
      *
-     * @param holder base URL holder.
-     * @param varsMap variable map.
+     * @param context Selenese Runner context.
      */
-    public Eval(BaseURLHolder holder, Map<String, Object> varsMap) {
-        this.mutator = new SeleneseRunnerMutator(holder);
-        this.varsMap = varsMap;
+    public Eval(Context context) {
+        this.mutator = new SeleneseRunnerMutator(context);
+        this.context = context;
     }
 
     /**
@@ -40,6 +40,7 @@ public class Eval {
      * @return result of evaluating script.
      */
     public Object eval(WebDriver driver, String script) {
+        VarsMap varsMap = context.getVarsMap();
         boolean hasStoredVars = script.matches(".*\\bstoredVars\\b.*");
         StringBuilderWriter writer = new StringBuilderWriter();
         if (hasStoredVars) {
@@ -76,5 +77,4 @@ public class Eval {
             return list.get(0);
         }
     }
-
 }
