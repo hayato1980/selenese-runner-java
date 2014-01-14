@@ -41,6 +41,7 @@ public class Runner implements Context, HtmlResultHolder {
     private static final FastDateFormat FILE_DATE_TIME = FastDateFormat.getInstance("yyyyMMdd_HHmmssSSS");
 
     private WebDriver driver;
+    private String initialWindowHandle;
     private String screenshotDir = null;
     private String screenshotAllDir = null;
     private String screenshotOnFailDir = null;
@@ -167,6 +168,11 @@ public class Runner implements Context, HtmlResultHolder {
         return driver;
     }
 
+    @Override
+    public String getInitialWindowHandle() {
+        return initialWindowHandle;
+    }
+
     /**
      * Set WebDriver.
      *
@@ -174,6 +180,7 @@ public class Runner implements Context, HtmlResultHolder {
      */
     public void setDriver(WebDriver driver) {
         this.driver = driver;
+        this.initialWindowHandle = driver.getWindowHandle();
     }
 
     /**
