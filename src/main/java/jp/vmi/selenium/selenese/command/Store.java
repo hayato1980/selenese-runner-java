@@ -51,7 +51,7 @@ public class Store extends Command {
 
     @Override
     protected Result doCommandImpl(TestCase testCase, Runner runner) {
-        Object result = testCase.getProc().execute(getter, getterArgs);
+        Object result = runner.getProc().execute(getter, getterArgs);
         runner.getVarsMap().put(varName, result);
         return new Success(String.valueOf(result));
     }

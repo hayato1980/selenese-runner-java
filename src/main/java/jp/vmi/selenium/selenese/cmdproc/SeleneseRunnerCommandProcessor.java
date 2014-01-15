@@ -53,6 +53,18 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
         setUpMethodMap();
     }
 
+    /**
+     * Get Selenese Runner context.
+     * <br>
+     * <b>Internal use only.</b>
+     * 
+     * @return Selenese Runner context.
+     */
+    @Deprecated
+    public Context getContext() {
+        return context;
+    }
+
     private void setUpMethodMap() {
         seleneseMethods.put("addLocationStrategy", new AddLocationStrategy(elementFinder));
         seleneseMethods.put("addSelection", new AddSelection(javascriptLibrary, elementFinder));
@@ -236,6 +248,16 @@ public class SeleneseRunnerCommandProcessor implements WrapsDriver {
             String message = e.getMessage().replaceFirst("\\s*\\([^()]+\\)$", "");
             throw new SeleniumException(message, e);
         }
+    }
+
+    /**
+     * Get boolean value of expr.
+     * 
+     * @param expr expression.
+     * @return cast from result of expr to Javascript Boolean.
+     */
+    public boolean isTrue(String expr) {
+        return (Boolean) eval.eval(context.getWrappedDriver(), context.getVarsMap().replaceVars(expr), "Boolean");
     }
 
     /**
