@@ -60,18 +60,30 @@ public class Runner implements Context, HtmlResultHolder {
     private int timeout = 30 * 1000; /* ms */
     private long initialSpeed = 0; /* ms */
     private long speed = 0; /* ms */
-    private final SeleneseRunnerCommandProcessor proc = new SeleneseRunnerCommandProcessor(this);
-    private final CommandFactory commandFactory = new CommandFactory(this);
-    private final Eval eval = new Eval(this);
-    private final WebDriverElementFinder elementFinder = new WebDriverElementFinder();
-    private final List<HighlightStyleBackup> styleBackups = new ArrayList<HighlightStyleBackup>();
 
+    private final Eval eval;
+    private final SeleneseRunnerCommandProcessor proc;
+    private final WebDriverElementFinder elementFinder;
+    private final CommandFactory commandFactory;
     private VarsMap varsMap = new VarsMap();
+    private final List<HighlightStyleBackup> styleBackups;
 
     private int countForDefault = 0;
 
     private final JUnitResult jUnitResult = new JUnitResult();
     private final HtmlResult htmlResult = new HtmlResult();
+
+    /**
+     * Constructor.
+     */
+    public Runner() {
+        this.eval = new Eval(this);
+        this.elementFinder = new WebDriverElementFinder();
+        this.proc = new SeleneseRunnerCommandProcessor(this);
+        this.commandFactory = new CommandFactory(this);
+        this.varsMap = new VarsMap();
+        this.styleBackups = new ArrayList<HighlightStyleBackup>();
+    }
 
     /**
      * Set PrintStream for logging.
