@@ -21,7 +21,7 @@ public class Open extends Command {
     protected Result doCommandImpl(TestCase testCase, Runner runner) {
         String url = runner.getVarsMap().replaceVars(args[URL]);
         if (!url.contains("://"))
-            url = testCase.getBaseURL() + (url.startsWith("/") ? "" : "/") + url;
+            url = runner.getBaseURL() + (url.startsWith("/") ? "" : "/") + url;
         runner.getWrappedDriver().get(url);
         return SUCCESS;
     }

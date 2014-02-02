@@ -62,7 +62,7 @@ public abstract class TestCaseTestBase extends TestBase {
             }
         };
         runner.setDriver(driver);
-        runner.setBaseURL(wsr.getBaseURL());
+        runner.setOverridingBaseURL(wsr.getBaseURL());
         runner.setScreenshotDir(screenshotDir.getRoot().getPath());
         runner.setScreenshotOnFailDir(screenshotOnFailDir.getRoot().getPath());
         runner.setJUnitResultDir(xmlResultDir.getRoot().getPath());

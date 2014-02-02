@@ -34,7 +34,7 @@ public class BuiltInCommandTest extends TestBase {
         wdm.setDriverOptions(new DriverOptions());
         Runner runner = new Runner();
         runner.setDriver(wdm.get());
-        runner.setBaseURL(wsr.getBaseURL());
+        runner.setOverridingBaseURL(wsr.getBaseURL());
         CommandFactory cf = runner.getCommandFactory();
         TestCase testCase = Binder.newTestCase("dummy", "dummy", wsr.getBaseURL());
         testCase.addCommand(cf, "open", "/index.html");

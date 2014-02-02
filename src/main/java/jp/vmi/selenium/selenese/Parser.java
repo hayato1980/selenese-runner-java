@@ -14,6 +14,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import jp.vmi.selenium.selenese.command.ICommandFactory;
 import jp.vmi.selenium.selenese.inject.Binder;
 
 import static org.apache.xerces.impl.Constants.*;
@@ -65,8 +66,26 @@ public abstract class Parser {
      * @param is input stream of script file. (test-case or test-suite)
      * @param runner Runner object.
      * @return TestCase or TestSuite.
+     * 
+     * @deprecated Replaced by {@link #parse(String, InputStream, ICommandFactory)} 
      */
+    @Deprecated
     public static Selenese parse(String filename, InputStream is, Runner runner) {
+        Selenese selenese = parse(filename, is, runner.getCommandFactory());
+        if (selenese instanceof TestCase)
+            ((TestCase) selenese).setContext(runner);
+        return selenese;
+    }
+
+    /**
+     * Parse input stream.
+     *
+     * @param filename selenese script file. (not open. used for label or generating output filename)
+     * @param is input stream of script file. (test-case or test-suite)
+     * @param commandFactory command factory.
+     * @return TestCase or TestSuite.
+     */
+    public static Selenese parse(String filename, InputStream is, ICommandFactory commandFactory) {
         try {
             DOMParser dp = new DOMParser();
             dp.setEntityResolver(null);
@@ -77,11 +96,11 @@ public abstract class Parser {
             Node seleniumBase = XPathAPI.selectSingleNode(document, "/HTML/HEAD/LINK[@rel='selenium.base']/@href");
             if (seleniumBase != null) {
                 String baseURL = seleniumBase.getNodeValue();
-                return new TestCaseParser(filename, document, baseURL).parse(runner);
+                return new TestCaseParser(filename, document, baseURL).parse(commandFactory);
             }
             Node suiteTable = XPathAPI.selectSingleNode(document, "/HTML/BODY/TABLE[@id='suiteTable']");
             if (suiteTable != null) {
-                return new TestSuiteParser(filename, document).parse(runner);
+                return new TestSuiteParser(filename, document).parse(commandFactory);
             }
             return Binder.newErrorTestCase(filename, new InvalidSeleneseException(
                 "Not selenese script. Missing neither 'selenium.base' link nor table with 'suiteTable' id"));
@@ -99,10 +118,27 @@ public abstract class Parser {
      * @param filename selenese script file. (test-case or test-suite)
      * @param runner Runner object.
      * @return TestCase or TestSuite.
+     * 
+     * @deprecated {@link #parse(String, ICommandFactory)}
      */
+    @Deprecated
     public static Selenese parse(String filename, Runner runner) {
+        Selenese selenese = parse(filename, runner.getCommandFactory());
+        if (selenese instanceof TestCase)
+            ((TestCase) selenese).setContext(runner);
+        return selenese;
+    }
+
+    /**
+    * Parse file.
+    *
+    * @param filename selenese script file. (test-case or test-suite)
+    * @param commandFactory command factory.
+    * @return TestCase or TestSuite.
+    */
+    public static Selenese parse(String filename, ICommandFactory commandFactory) {
         try {
-            return parse(filename, new FileInputStream(filename), runner);
+            return parse(filename, new FileInputStream(filename), commandFactory);
         } catch (FileNotFoundException e) {
             return Binder.newErrorTestCase(filename, new InvalidSeleneseException(e.getMessage()));
         }
@@ -116,5 +152,5 @@ public abstract class Parser {
         this.docucment = document;
     }
 
-    protected abstract Selenese parse(Runner runner);
+    protected abstract Selenese parse(ICommandFactory commandFactory);
 }

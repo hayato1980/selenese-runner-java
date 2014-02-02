@@ -54,7 +54,7 @@ public class Runner implements Context, HtmlResultHolder {
     private String screenshotDir = null;
     private String screenshotAllDir = null;
     private String screenshotOnFailDir = null;
-    private String baseURL = "";
+    private String overridingBaseURL = null;
     private boolean ignoreScreenshotCommand = false;
     private boolean isHighlight = false;
     private int timeout = 30 * 1000; /* ms */
@@ -65,6 +65,8 @@ public class Runner implements Context, HtmlResultHolder {
     private final SeleneseRunnerCommandProcessor proc;
     private final WebDriverElementFinder elementFinder;
     private final CommandFactory commandFactory;
+
+    private String baseURL = "";
     private VarsMap varsMap = new VarsMap();
     private final List<HighlightStyleBackup> styleBackups;
 
@@ -244,11 +246,9 @@ public class Runner implements Context, HtmlResultHolder {
     }
 
     /**
-     * Get URL for overriding selenium.base in Selenese script.
-     * <p>
-     * <b>Internal use only.</b>
-     * </p>
-     * @return URL.
+     * Get current base URL.
+     *
+     * @return base URL.
      */
     @Override
     public String getBaseURL() {
@@ -258,10 +258,31 @@ public class Runner implements Context, HtmlResultHolder {
     /**
      * Set URL for overriding selenium.base in Selenese script.
      *
-     * @param baseURL URL.
+     * @param baseURL base URL.
+     * 
+     * @deprecated Replaced by {@link #setOverridingBaseURL(String)}
      */
+    @Deprecated
     public void setBaseURL(String baseURL) {
-        this.baseURL = baseURL;
+        setOverridingBaseURL(baseURL);
+    }
+
+    /**
+     * Initialize base URL.
+     *
+     * @param defaultBaseURL base URL.
+     */
+    public void initBaseURL(String defaultBaseURL) {
+        this.baseURL = StringUtils.defaultIfBlank(overridingBaseURL, defaultBaseURL);
+    }
+
+    /**
+     * Set URL for overriding selenium.base in Selenese script.
+     *
+     * @param overridingBaseURL base URL.
+     */
+    public void setOverridingBaseURL(String overridingBaseURL) {
+        this.overridingBaseURL = overridingBaseURL;
     }
 
     /**
@@ -298,21 +319,6 @@ public class Runner implements Context, HtmlResultHolder {
      */
     public void setHighlight(boolean isHighlight) {
         this.isHighlight = isHighlight;
-    }
-
-    /**
-     * Get <b>effective</b> base URL for running Selenese script.
-     * <p>
-     * <b>Internal use only.</b>
-     * </p>
-     * @param baseURL URL specified in file.
-     * @return effective URL.
-     */
-    public String getEffectiveBaseURL(String baseURL) {
-        if (StringUtils.isBlank(this.baseURL))
-            return baseURL;
-        else
-            return this.baseURL;
     }
 
     /**
@@ -472,7 +478,7 @@ public class Runner implements Context, HtmlResultHolder {
         TestSuite defaultTestSuite = null;
         List<TestSuite> testSuiteList = new ArrayList<TestSuite>();
         for (String filename : filenames) {
-            Selenese selenese = Parser.parse(filename, this);
+            Selenese selenese = Parser.parse(filename, commandFactory);
             if (selenese.isError()) {
                 log.error(selenese.toString());
                 totalResult = ((ErrorSource) selenese).getResult();
@@ -514,7 +520,9 @@ public class Runner implements Context, HtmlResultHolder {
      */
     public Result run(String filename, InputStream is) {
         TestSuite testSuite;
-        Selenese selenese = Parser.parse(filename, is, this);
+        Selenese selenese = Parser.parse(filename, is, commandFactory);
+        if (selenese instanceof TestCase)
+            ((TestCase) selenese).setContext(this); // for backward compatibility.
         switch (selenese.getType()) {
         case TEST_CASE:
             testSuite = Binder.newTestSuite(null, String.format("default-%02d", countForDefault++));
