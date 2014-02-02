@@ -12,7 +12,7 @@ import jp.vmi.selenium.selenese.locator.WebDriverElementFinder;
 public interface Context extends WrapsDriver {
 
     /**
-     * Get base URL.
+     * Get current base URL.
      *
      * @return base URL.
      */

@@ -21,8 +21,7 @@ import jp.vmi.selenium.selenese.cmdproc.WDCommand;
 /**
  * Factory of selenese command.
  */
-@SuppressWarnings("deprecation")
-public class CommandFactory {
+public class CommandFactory implements ICommandFactory {
 
     private static final Map<String, Constructor<? extends Command>> constructorMap = new HashMap<String, Constructor<? extends Command>>();
 
@@ -76,7 +75,7 @@ public class CommandFactory {
     private static final int IS_PRESENT_INVERSE = 4;
     private static final int PRESENT = 5;
 
-    private final List<UserDefinedCommandFactory> userDefinedCommandFactories = new ArrayList<UserDefinedCommandFactory>();
+    private final List<ICommandFactory> userDefinedCommandFactories = new ArrayList<ICommandFactory>();
 
     private Context context = null;
 
@@ -97,12 +96,24 @@ public class CommandFactory {
     }
 
     /**
-     * Register user defined command factoryName.
+     * Register command factory.
+     *
+     * @param factory command factory.
+     */
+    public void registerCommandFactory(ICommandFactory factory) {
+        userDefinedCommandFactories.add(factory);
+    }
+
+    /**
+     * Register user defined command factory.
      *
      * @param factory user defined command factory.
+     * 
+     * @deprecated Replaced by {@link #registerCommandFactory(ICommandFactory)}
      */
+    @Deprecated
     public void registerUserDefinedCommandFactory(UserDefinedCommandFactory factory) {
-        userDefinedCommandFactories.add(factory);
+        registerCommandFactory(factory);
     }
 
     /**
@@ -125,29 +136,13 @@ public class CommandFactory {
         this.context = proc.getContext();
     }
 
-    /**
-     * Constructs selenese command.
-     *
-     * @param index index in selenese script file.
-     * @param cmdWithArgs cmmand and arguments.
-     * @return Command instance.
+    /*
+     * @see jp.vmi.selenium.selenese.command.ICommandFactory#newCommand(int, java.lang.String, java.lang.String)
      */
-    public Command newCommand(int index, List<String> cmdWithArgs) {
-        String name = cmdWithArgs.remove(0);
-        return newCommand(index, name, cmdWithArgs.toArray(new String[cmdWithArgs.size()]));
-    }
-
-    /**
-     * Constructs selenese command.
-     *
-     * @param index index in selenese script file.
-     * @param name command name.
-     * @param args command arguments.
-     * @return Command instance.
-     */
+    @Override
     public Command newCommand(int index, String name, String... args) {
         // user defined command.
-        for (UserDefinedCommandFactory factory : userDefinedCommandFactories) {
+        for (ICommandFactory factory : userDefinedCommandFactories) {
             Command command = factory.newCommand(index, name, args);
             if (command != null)
                 return command;
