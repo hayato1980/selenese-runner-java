@@ -270,6 +270,7 @@ public class TestCase implements Selenese, ITestCase {
         if (commandList.isEmpty())
             return result = SUCCESS;
         runner.initBaseURL(baseURL);
+        logRecorder.setPrintStream(runner.getPrintStream());
         Command command = commandList.first();
         while (command != null) {
             Result r = doCommand(command, runner);
