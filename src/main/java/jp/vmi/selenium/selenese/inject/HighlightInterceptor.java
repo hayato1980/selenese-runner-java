@@ -21,7 +21,8 @@ public class HighlightInterceptor implements MethodInterceptor {
         runner.unhighlight();
         if (runner.isHighlight()) {
             int i = 0;
-            for (String locator : command.getLocators())
+            String[] locators = runner.getVarsMap().replaceVarsForArray(command.getLocators());
+            for (String locator : locators)
                 runner.highlight(locator, HighlightStyle.ELEMENT_STYLES[i++]);
         }
         Result result = (Result) invocation.proceed();
